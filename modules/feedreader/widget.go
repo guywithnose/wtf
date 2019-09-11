@@ -11,8 +11,13 @@ import (
 	"github.com/wtfutil/wtf/view"
 )
 
-const (
-	publishedDateLayout = "Mon, 02 2006 15:04:05"
+var (
+	publishedDateLayouts = []string{
+		"Mon, 02 2006 15:04:05",
+		"2006-01-02T15:04:05-07:00",
+		"Mon, 02 Jan 2006 15:04:05 -0700",
+		"2006-01-02T15:04:05Z",
+	}
 )
 
 // FeedItem represents an item returned from an RSS or Atom feed
@@ -160,13 +165,31 @@ func (widget *Widget) content() (string, string, bool) {
 // feedItems are sorted by published date
 func (widget *Widget) sort(feedItems []*FeedItem) []*FeedItem {
 	sort.Slice(feedItems, func(i, j int) bool {
-		iTime, _ := time.Parse(publishedDateLayout, feedItems[i].item.Published)
-		jTime, _ := time.Parse(publishedDateLayout, feedItems[j].item.Published)
+		iTime, err := parseTime(feedItems[i].item.Published)
+		if err != nil {
+			iTime, _ = parseTime(feedItems[i].item.Updated)
+		}
+
+		jTime, err := parseTime(feedItems[j].item.Published)
+		if err != nil {
+			jTime, _ = parseTime(feedItems[j].item.Updated)
+		}
 
 		return iTime.After(jTime)
 	})
 
 	return feedItems
+}
+
+func parseTime(input string) (time.Time, error) {
+	for _, layout := range publishedDateLayouts {
+		t, err := time.Parse(layout, input)
+		if err == nil {
+			return t, nil
+		}
+	}
+
+	return time.Time{}, fmt.Errorf("Could not parse %s", input)
 }
 
 func (widget *Widget) openStory() {
