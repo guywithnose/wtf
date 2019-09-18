@@ -21,8 +21,8 @@ func (widget *Widget) initializeKeyboardControls() {
 	widget.SetKeyboardKey(tcell.KeyUp, widget.displayPrev, "Select previous item")
 	widget.SetKeyboardKey(tcell.KeyEsc, widget.unselect, "Clear selection")
 	widget.SetKeyboardKey(tcell.KeyCtrlD, widget.deleteSelected, "Delete item")
-	widget.SetKeyboardKey(tcell.KeyCtrlJ, widget.demoteSelected, "Demote item")
-	widget.SetKeyboardKey(tcell.KeyCtrlK, widget.promoteSelected, "Promote item")
+	widget.SetKeyboardKey(tcell.KeyDown, widget.demoteSelected, "Demote item")
+	widget.SetKeyboardKey(tcell.KeyUp, widget.promoteSelected, "Promote item")
 	widget.SetKeyboardKey(tcell.KeyEnter, widget.editSelected, "Edit item")
 
 }
